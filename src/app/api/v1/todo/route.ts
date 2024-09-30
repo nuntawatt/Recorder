@@ -1,56 +1,27 @@
-import { connectToDatabase } from "@/lib/mongodb";
-import Todo from "@/models/todo";
-import { NextRequest, NextResponse } from "next/server";
+// src/app/api/todo/route.ts
+import { NextResponse } from 'next/server';
+import { MongoClient } from 'mongodb';
 
-// CRUD => CREATE UPDATE 
-// READ data
-// url => api/v1/todo
-export async function GET() {
-  try {
-    await connectToDatabase();
-    const todoResult = await Todo.find({});
-    return NextResponse.json({ data: todoResult });
-  } catch (err) {
-    return NextResponse.json({
-      error: err,
-    });
-  }
-}
-// Create
-// req => {name: "", note: ""}
-// url => api/v1/todo/id
-export async function POST(req: NextRequest){
-  try {
-  const body = await req.json();
-  const res = await Todo.create(body);
-  return NextResponse.json({data: res});
-  }catch(error){
-    return NextResponse.json({
-      error: error,
-    });
-  }
-}
-// Update
-export async function PUT(req: NextRequest){
-  try {
-    const body = await req.json();
-    const res = await Todo.updateOne(body);
-    return NextResponse.json({data: res});
-    }catch(error){
-      return NextResponse.json({
-        error: error,
-      });
-    }
-}
-// Delete
-export async function DELETE(req: NextRequest){
-  try {
-    const body = await req.json();
-    const res = await Todo.deleteOne(body);
-    return NextResponse.json({data: res});
-    }catch(error){
-      return NextResponse.json({
-        error: error,
-      });
+const uri = 'mongodb+srv://moragon:abYRP75FhqkjOAFS@cluster0.rxw2a.mongodb.net/'; 
+const client = new MongoClient(uri);
+
+export async function POST(request: Request) {
+    const body = await request.json();
+    
+    const { amount, date, type, note } = body;
+
+    try {
+        await client.connect();
+        const database = client.db('Todo-app'); // แทนที่ด้วยชื่อฐานข้อมูลของคุณ
+        const collection = database.collection('todos'); // แทนที่ด้วยชื่อคอลเลคชันของคุณ
+
+        const newExpense = { amount, date, type, note };
+        await collection.insertOne(newExpense);
+
+        return NextResponse.json({ message: 'บันทึกสำเร็จ' }, { status: 201 });
+    } catch (error) {
+        return NextResponse.json({ error: 'เกิดข้อผิดพลาดในการบันทึก' }, { status: 500 });
+    } finally {
+        await client.close();
     }
 }
