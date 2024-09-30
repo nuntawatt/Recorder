@@ -94,7 +94,7 @@ const ExpenseTracker: React.FC = () => {
                         value={note}
                         onChange={(e) => setNote(e.target.value)}
                         rows={4}
-                    />
+                    />   
                 </label>
                 <button className={styles.button} type="submit">บันทึก</button>
             </form>
