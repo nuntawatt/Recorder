@@ -91,7 +91,7 @@ const ExpenseTracker: React.FC = () => {
                     โน้ต:
                     <textarea
                         className={styles.textarea}
-                        value={note}
+                        value={note}    
                         onChange={(e) => setNote(e.target.value)}
                         rows={4}
                     />   
